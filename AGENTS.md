@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Demo data lives in src/lib/demo-data.ts, pure review rules in src/lib/review-logic.ts (tested), shared client state + localStorage in src/lib/review-store.tsx — keeps data, logic and UI separable.
