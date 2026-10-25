@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { INITIAL_CLIPS, type Clip } from "./demo-data";
 import { applyReview } from "./review-logic";
 
@@ -28,6 +28,8 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
   const [activity, setActivity] = useState<Activity[]>(INITIAL_ACTIVITY);
   const [simulateFailure, setSimulateFailure] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const clipsRef = useRef(clips);
+  clipsRef.current = clips;
 
   useEffect(() => {
     try {
@@ -52,8 +54,9 @@ export function ReviewProvider({ children }: { children: ReactNode }) {
     async (clipId: string, playerId: string, reason: string | null) => {
       await new Promise((r) => setTimeout(r, 700));
       if (simulateFailure) throw new Error("Couldn't save the assignment (simulated network error). Your selection was kept — try again.");
-      let next: Clip[] = [];
-      setClips((prev) => (next = applyReview(prev, clipId, playerId, reason)));
+      const next = applyReview(clipsRef.current, clipId, playerId, reason);
+      clipsRef.current = next;
+      setClips(next);
       const clip = next.find((c) => c.id === clipId);
       if (clip) {
         const verb = clip.resolution === "corrected" ? "Corrected" : "Confirmed";
